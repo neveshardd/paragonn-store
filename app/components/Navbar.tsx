@@ -18,7 +18,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const webUrl = "http://localhost:3000";
+  const webUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   return (
     <header

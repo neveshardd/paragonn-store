@@ -4,27 +4,27 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer style={{ 
-        background: "#13111a", 
-        borderTop: "1px solid #2a2540", 
-        padding: "80px 24px 40px",
-        marginTop: "auto"
+    <footer style={{
+      background: "#13111a",
+      borderTop: "1px solid #2a2540",
+      padding: "80px 24px 40px",
+      marginTop: "auto"
     }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ 
-            display: "grid", 
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", 
-            gap: 64, 
-            marginBottom: 64 
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 64,
+          marginBottom: 64
         }}>
           {/* Brand */}
           <div style={{ textAlign: 'left' }}>
-            <Image 
-                src="/logo.png" 
-                alt="Paragonn" 
-                width={140} 
-                height={48} 
-                style={{ width: 'auto', height: '40px', marginBottom: 24, opacity: 0.8 }}
+            <Image
+              src="/logo.png"
+              alt="Paragonn"
+              width={140}
+              height={48}
+              style={{ width: 'auto', height: '40px', marginBottom: 24, opacity: 0.8 }}
             />
             <p style={{ color: "#7a7590", fontSize: 14, lineHeight: 1.7, maxWidth: 300 }}>
               A loja oficial do servidor Paragonn. Qualidade, segurança e os melhores benefícios exclusivos para sua aventura com a gente.
@@ -51,24 +51,24 @@ export default function Footer() {
             <p style={{ color: "#7a7590", fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>
               Aceitamos diversas formas de pagamento processadas com segurança total.
             </p>
-            <div style={{ display: 'flex', gap: 12, opacity: 0.5 }}>
-                 <div style={{ width: 44, height: 28, background: 'rgba(255,255,255,0.1)', border: '1px solid #2a2540', borderRadius: 4 }}></div>
-                 <div style={{ width: 44, height: 28, background: 'rgba(255,255,255,0.1)', border: '1px solid #2a2540', borderRadius: 4 }}></div>
-                 <div style={{ width: 44, height: 28, background: 'rgba(255,255,255,0.1)', border: '1px solid #2a2540', borderRadius: 4 }}></div>
+            <div style={{ display: 'flex', gap: 12 }}>
+              <Image src="/image-pix.png" alt="Pix" width={32} height={24} style={{ height: 24, width: 'auto', opacity: 0.8 }} />
+              <Image src="/mp.png" alt="Mercado Pago" width={48} height={32} style={{ height: 32, width: 'auto', opacity: 0.8 }} />
+              <Image src="/credit-card.png" alt="Cartão" width={48} height={32} style={{ height: 32, width: 'auto', opacity: 0.8 }} />
             </div>
           </div>
         </div>
 
-        <div style={{ 
-            borderTop: "1px solid #2a2540", 
-            paddingTop: 40, 
-            textAlign: "center", 
-            fontSize: 12, 
-            color: "#7a7590",
-            letterSpacing: '0.02em'
+        <div style={{
+          borderTop: "1px solid #2a2540",
+          paddingTop: 40,
+          textAlign: "center",
+          fontSize: 12,
+          color: "#7a7590",
+          letterSpacing: '0.02em'
         }}>
           &copy; {currentYear} Paragonn Network. Todos os direitos reservados.
-          <br/>
+          <br />
           <span style={{ fontSize: 10, opacity: 0.6, marginTop: 8, display: 'inline-block' }}>
             Não somos afiliados à Mojang AB ou Microsoft.
           </span>

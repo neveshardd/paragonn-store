@@ -37,7 +37,23 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean, onCl
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
                 {cart.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted)' }}>
-                        Seu carrinho está vazio.
+                        <p style={{ marginBottom: 24 }}>Seu carrinho está vazio.</p>
+                        <button 
+                            onClick={onClose}
+                            style={{ 
+                                background: 'var(--gold)', 
+                                border: 'none', 
+                                color: '#000', 
+                                padding: '12px 24px', 
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            Ver Produtos
+                        </button>
                     </div>
                 ) : (
                     cart.map(item => (
@@ -70,10 +86,33 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean, onCl
                         href="/checkout" 
                         onClick={onClose}
                         className="btn-primary" 
-                        style={{ width: '100%', textDecoration: 'none' }}
+                        style={{ width: '100%', textDecoration: 'none', textAlign: 'center' }}
                     >
                         FINALIZAR COMPRA
                     </Link>
+
+                    <button 
+                        onClick={onClose}
+                        style={{ 
+                            width: '100%', 
+                            marginTop: 12, 
+                            background: 'none', 
+                            border: '1px solid var(--border)', 
+                            color: '#fff', 
+                            padding: '16px', 
+                            borderRadius: '12px',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                    >
+                        Continuar Comprando
+                    </button>
                 </div>
             )}
         </div>
