@@ -5,9 +5,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 declare global {
-  interface Window {
-    MercadoPago: any;
-  }
+    interface Window {
+        MercadoPago: any;
+    }
 }
 
 export default function CheckoutPage() {
@@ -45,7 +45,7 @@ export default function CheckoutPage() {
             setStatusMsg({ type: 'error', text: 'Preencha todos os campos!' });
             return;
         }
-        
+
         if (payment === 'pix') {
             generatePix();
         } else {
@@ -59,7 +59,7 @@ export default function CheckoutPage() {
         setStatusMsg(null);
 
         try {
-            const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY);
+            const mp = new window.MercadoPago(process.env.MP_PUBLIC_KEY);
             const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
             const cleanIdentificationNumber = cardData.identificationNumber.replace(/\D/g, "");
 
@@ -86,7 +86,7 @@ export default function CheckoutPage() {
                     body: JSON.stringify({
                         token: tokenResponse.id,
                         transaction_amount: total,
-                        payment_method_id: paymentMethod, 
+                        payment_method_id: paymentMethod,
                         installments: 1,
                         payer: { email, identification: { type: cardData.identificationType, number: cleanIdentificationNumber } },
                         metadata: { nick, items: JSON.stringify(cart.map(i => ({ id: i.id, cmd: i.comando }))) }
@@ -145,7 +145,7 @@ export default function CheckoutPage() {
 
     return (
         <main style={{ minHeight: '100vh', paddingTop: 180, paddingBottom: 100, maxWidth: 1000, margin: '0 auto', padding: '180px 24px 100px' }}>
-            
+
             {statusMsg && (
                 <div style={{ padding: 20, borderRadius: 12, marginBottom: 32, textAlign: 'center', background: statusMsg.type === 'success' ? 'rgba(0, 255, 100, 0.1)' : 'rgba(255, 50, 50, 0.1)', border: `1px solid ${statusMsg.type === 'success' ? '#00ff64' : '#ff3232'}`, color: statusMsg.type === 'success' ? '#00ff64' : '#ff3232' }}>
                     {statusMsg.text}
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
                     </>
                 ) : (
                     <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto', background: 'var(--surface)', padding: '64px 32px', borderRadius: 32, border: '1px solid var(--border)' }}>
-                        
+
                         {payment === 'pix' && pixData && (
                             <div className="fade-up">
                                 <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 24 }}>Finalize seu PIX</h1>
@@ -227,37 +227,37 @@ export default function CheckoutPage() {
                                 <form onSubmit={processCardPayment} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                                     <div>
                                         <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO CARTÃO</label>
-                                        <input required type="text" placeholder="0000 0000 0000 0000" value={cardData.cardNumber} onChange={e => setCardData({...cardData, cardNumber: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                        <input required type="text" placeholder="0000 0000 0000 0000" value={cardData.cardNumber} onChange={e => setCardData({ ...cardData, cardNumber: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>MÊS (MM)</label>
-                                            <input required type="text" placeholder="01" value={cardData.cardExpirationMonth} onChange={e => setCardData({...cardData, cardExpirationMonth: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <input required type="text" placeholder="01" value={cardData.cardExpirationMonth} onChange={e => setCardData({ ...cardData, cardExpirationMonth: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>ANO (AA)</label>
-                                            <input required type="text" placeholder="28" value={cardData.cardExpirationYear} onChange={e => setCardData({...cardData, cardExpirationYear: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <input required type="text" placeholder="28" value={cardData.cardExpirationYear} onChange={e => setCardData({ ...cardData, cardExpirationYear: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>CVV</label>
-                                            <input required type="text" placeholder="123" value={cardData.securityCode} onChange={e => setCardData({...cardData, securityCode: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <input required type="text" placeholder="123" value={cardData.securityCode} onChange={e => setCardData({ ...cardData, securityCode: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
                                     </div>
                                     <div>
                                         <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NOME IMPRESSO NO CARTÃO</label>
-                                        <input required type="text" placeholder="JOÃO D SILVA" value={cardData.cardholderName} onChange={e => setCardData({...cardData, cardholderName: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                        <input required type="text" placeholder="JOÃO D SILVA" value={cardData.cardholderName} onChange={e => setCardData({ ...cardData, cardholderName: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>TIPO</label>
-                                            <select value={cardData.identificationType} onChange={e => setCardData({...cardData, identificationType: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }}>
+                                            <select value={cardData.identificationType} onChange={e => setCardData({ ...cardData, identificationType: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }}>
                                                 <option value="CPF">CPF</option>
                                                 <option value="CNPJ">CNPJ</option>
                                             </select>
                                         </div>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO DOCUMENTO</label>
-                                            <input required type="text" placeholder="000.000.000-00" value={cardData.identificationNumber} onChange={e => setCardData({...cardData, identificationNumber: e.target.value})} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <input required type="text" placeholder="000.000.000-00" value={cardData.identificationNumber} onChange={e => setCardData({ ...cardData, identificationNumber: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
                                     </div>
                                     <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: 18, fontSize: 16, marginTop: 12 }}>
