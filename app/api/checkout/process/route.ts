@@ -17,7 +17,8 @@ export async function POST(request: Request) {
     const body = {
         token,
         payment_method_id,
-        transaction_amount,
+        transaction_amount: Number(transaction_amount),
+        description: `Compra na Paragonn Store - ${metadata?.nick || 'Jogador'}`,
         installments: Number(installments),
         payer,
         metadata,
