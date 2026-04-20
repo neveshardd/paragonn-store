@@ -63,15 +63,25 @@ export default function CheckoutPage() {
         try {
             const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY);
             
+            const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
+            const cleanIdentificationNumber = cardData.identificationNumber.replace(/\D/g, "");
+
+            // Detecção básica de bandeira
+            let paymentMethod = 'master';
+            if (cleanCardNumber.startsWith('4')) paymentMethod = 'visa';
+            else if (cleanCardNumber.startsWith('3')) paymentMethod = 'amex';
+            else if (cleanCardNumber.startsWith('6') || cleanCardNumber.startsWith('50')) paymentMethod = 'elo';
+            else if (cleanCardNumber.startsWith('5')) paymentMethod = 'master';
+
             // Cria o token do cartão de forma transparente
             const tokenResponse = await mp.createCardToken({
-                cardNumber: cardData.cardNumber,
+                cardNumber: cleanCardNumber,
                 cardExpirationMonth: cardData.cardExpirationMonth,
                 cardExpirationYear: cardData.cardExpirationYear,
                 securityCode: cardData.securityCode,
                 cardholderName: cardData.cardholderName,
                 identificationType: cardData.identificationType,
-                identificationNumber: cardData.identificationNumber,
+                identificationNumber: cleanIdentificationNumber,
             });
 
             if (tokenResponse.id) {
@@ -81,7 +91,7 @@ export default function CheckoutPage() {
                     body: JSON.stringify({
                         token: tokenResponse.id,
                         transaction_amount: total,
-                        payment_method_id: 'master', // Simplificado para o exemplo, ideal capturar via SDK
+                        payment_method_id: paymentMethod, 
                         installments: 1,
                         payer: { email },
                         metadata: { nick, items: JSON.stringify(cart.map(i => ({ id: i.id, cmd: i.comando }))) }
@@ -92,10 +102,11 @@ export default function CheckoutPage() {
                     alert("Pagamento Aprovado!");
                     setStep(1); clearCart();
                 } else {
-                    alert("Status do pagamento: " + (data.status || 'Erro'));
+                    alert("Pagamento " + (data.status || 'recusado') + ": " + (data.detail || 'Verifique os dados'));
                 }
             } else {
-                alert("Erro ao validar cartão");
+                const errorMsg = tokenResponse.cause?.[0]?.message || "Dados do cartão inválidos";
+                alert("Erro: " + errorMsg);
             }
         } catch (err) {
             console.error(err);
