@@ -59,7 +59,7 @@ export default function CheckoutPage() {
         setStatusMsg(null);
 
         try {
-            const mp = new window.MercadoPago(process.env.MP_PUBLIC_KEY);
+            const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY);
             const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
             const cleanIdentificationNumber = cardData.identificationNumber.replace(/\D/g, "");
 
