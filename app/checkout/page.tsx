@@ -5,20 +5,22 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 declare global {
-  interface Window {
-    MercadoPago: any;
-  }
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        MercadoPago: any;
+    }
 }
 
 export default function CheckoutPage() {
     const { cart, total, clearCart } = useCart();
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState(1); // 1: Info, 2: Pagamento, 3: Sucesso
     const [nick, setNick] = useState("");
     const [email, setEmail] = useState("");
     const [payment, setPayment] = useState<"pix" | "cartao" | null>(null);
     const [loading, setLoading] = useState(false);
     const [statusMsg, setStatusMsg] = useState<{ type: 'error' | 'success', text: string } | null>(null);
     const [pixData, setPixData] = useState<{ qr_code: string, qr_code_base64: string } | null>(null);
+    const [orderId, setOrderId] = useState<string | null>(null);
 
     const [cardData, setCardData] = useState({
         cardNumber: "",
@@ -38,19 +40,11 @@ export default function CheckoutPage() {
         }
     }, []);
 
-    // Máscara para Cartão (0000 0000 0000 0000)
-    const maskCard = (value: string) => {
-        return value.replace(/\D/g, "").replace(/(\d{4})(?=\d)/g, "$1 ").substring(0, 19);
-    };
-
-    // Máscara para CPF (000.000.000-00) ou CNPJ (00.000.000/0000-00)
+    const maskCard = (value: string) => value.replace(/\D/g, "").replace(/(\d{4})(?=\d)/g, "$1 ").substring(0, 19);
     const maskDoc = (value: string, type: string) => {
         const v = value.replace(/\D/g, "");
-        if (type === "CPF") {
-            return v.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2").substring(0, 14);
-        } else {
-            return v.replace(/^(\d{2})(\d)/, "$1.$2").replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3").replace(/\.(\d{3})(\d)/, ".$1/$2").replace(/(\d{4})(\d)/, "$1-$2").substring(0, 18);
-        }
+        if (type === "CPF") return v.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2").substring(0, 14);
+        return v.replace(/^(\d{2})(\d)/, "$1.$2").replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3").replace(/\.(\d{3})(\d)/, ".$1/$2").replace(/(\d{4})(\d)/, "$1-$2").substring(0, 18);
     };
 
     const handleNextStep = (e: React.FormEvent) => {
@@ -76,7 +70,7 @@ export default function CheckoutPage() {
             let paymentMethod = 'master';
             if (cleanCardNumber.startsWith('4')) paymentMethod = 'visa';
             else if (cleanCardNumber.startsWith('3')) paymentMethod = 'amex';
-            else if (cleanCardNumber.startsWith('5031')) paymentMethod = 'master'; // Cartão de teste MP
+            else if (cleanCardNumber.startsWith('5031')) paymentMethod = 'master';
             else if (cleanCardNumber.startsWith('6') || cleanCardNumber.startsWith('50')) paymentMethod = 'elo';
             else if (cleanCardNumber.startsWith('5')) paymentMethod = 'master';
 
@@ -97,7 +91,7 @@ export default function CheckoutPage() {
                     body: JSON.stringify({
                         token: tokenResponse.id,
                         transaction_amount: total,
-                        payment_method_id: paymentMethod, 
+                        payment_method_id: paymentMethod,
                         installments: 1,
                         payer: { email, identification: { type: cardData.identificationType, number: cleanIdentificationNumber } },
                         metadata: { nick, items: JSON.stringify(cart.map(i => ({ id: i.id, cmd: i.comando }))) }
@@ -105,8 +99,9 @@ export default function CheckoutPage() {
                 });
                 const data = await res.json();
                 if (data.status === 'approved') {
-                    setStatusMsg({ type: 'success', text: 'Pagamento Aprovado! Itens entregues.' });
-                    setTimeout(() => { setStep(1); clearCart(); }, 3000);
+                    setOrderId(data.id);
+                    setStep(3);
+                    clearCart();
                 } else {
                     setStatusMsg({ type: 'error', text: `Pagamento ${data.status || 'recusado'}: ${data.detail || 'Verifique seus dados'}` });
                 }
@@ -154,134 +149,154 @@ export default function CheckoutPage() {
 
     return (
         <main style={{ minHeight: '100vh', paddingTop: 180, paddingBottom: 100, maxWidth: 1000, margin: '0 auto', padding: '180px 24px 100px' }}>
-            
+
             {statusMsg && (
                 <div style={{ padding: 20, borderRadius: 12, marginBottom: 32, textAlign: 'center', background: statusMsg.type === 'success' ? 'rgba(0, 255, 100, 0.1)' : 'rgba(255, 50, 50, 0.1)', border: `1px solid ${statusMsg.type === 'success' ? '#00ff64' : '#ff3232'}`, color: statusMsg.type === 'success' ? '#00ff64' : '#ff3232' }}>
                     {statusMsg.text}
                 </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: step === 1 ? '1.5fr 1fr' : '1fr', gap: 48 }}>
+            {step === 3 ? (
+                <div className="fade-up" style={{ textAlign: 'center', background: 'var(--surface)', padding: 64, borderRadius: 32, border: '1px solid var(--border)', maxWidth: 600, margin: '0 auto' }}>
+                    <div style={{ width: 80, height: 80, background: 'rgba(0, 255, 100, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ff64" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h1 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 16 }}>Pagamento Aprovado!</h1>
+                    <p style={{ color: 'var(--muted)', fontSize: 16, marginBottom: 32, lineHeight: 1.6 }}>Obrigado, <strong style={{ color: '#fff' }}>{nick}</strong>! Sua compra foi processada com sucesso e os itens já estão sendo enviados para o servidor.</p>
 
-                {step === 1 ? (
-                    <>
-                        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 24, padding: 48 }}>
-                            <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 32, fontFamily: 'var(--font-display)' }}>Finalizar Pedido</h1>
-                            <form onSubmit={handleNextStep} style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 10 }}>Seu Nick</label>
-                                        <input required type="text" value={nick} onChange={e => setNick(e.target.value)} placeholder="Ex: Notch" style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, color: '#fff' }} />
-                                    </div>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 10 }}>Seu E-mail</label>
-                                        <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="voce@exemplo.com" style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, color: '#fff' }} />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 16 }}>Forma de Pagamento</label>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-                                        {[
-                                            { id: 'pix', label: 'Pix Instantâneo' },
-                                            { id: 'cartao', label: 'Cartão de Crédito' }
-                                        ].map(m => (
-                                            <div key={m.id} onClick={() => setPayment(m.id as any)} style={{ padding: '20px 16px', borderRadius: 16, border: '1px solid', borderColor: payment === m.id ? 'var(--gold)' : 'var(--border)', background: payment === m.id ? 'rgba(245, 166, 35, 0.05)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' }}>
-                                                <div style={{ color: payment === m.id ? 'var(--gold)' : '#fff', fontWeight: 700, fontSize: 13 }}>{m.label}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                                <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: 18, fontSize: 16, marginTop: 12 }}>
-                                    {loading ? 'PROCESSANDO...' : 'REVISAR PEDIDO'}
-                                </button>
-                            </form>
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, marginBottom: 40, textAlign: 'left' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                            <span style={{ color: 'var(--muted)', fontSize: 13 }}>ID do Pedido:</span>
+                            <span style={{ color: 'var(--gold)', fontWeight: 700, fontFamily: 'monospace' }}>#{orderId}</span>
                         </div>
-                        <div style={{ background: 'rgba(245, 166, 35, 0.03)', border: '1px solid var(--border)', borderRadius: 24, padding: 32, height: 'fit-content' }}>
-                            <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 24 }}>Resumo</h2>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
-                                {cart.map(item => (
-                                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-                                        <span style={{ color: 'var(--muted)' }}>{item.quantity}x {item.nome}</span>
-                                        <span style={{ color: '#fff', fontWeight: 600 }}>R$ {(item.preco * item.quantity).toFixed(2)}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>Total</span>
-                                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--gold)' }}>R$ {total.toFixed(2)}</span>
-                            </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--muted)', fontSize: 13 }}>Status:</span>
+                            <span style={{ color: '#00ff64', fontWeight: 700, fontSize: 13 }}>CONCLUÍDO</span>
                         </div>
-                    </>
-                ) : (
-                    <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto', background: 'var(--surface)', padding: '64px 32px', borderRadius: 32, border: '1px solid var(--border)' }}>
-                        
-                        {payment === 'pix' && pixData && (
-                            <div className="fade-up">
-                                <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 24 }}>Finalize seu PIX</h1>
-                                <div style={{ background: '#fff', padding: 12, borderRadius: 12, display: 'inline-block', marginBottom: 24 }}>
-                                    <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="PIX" style={{ width: 180, height: 180 }} />
-                                </div>
-                                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', padding: 16, borderRadius: 12, marginBottom: 24 }}>
-                                    <p style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 8, textTransform: 'uppercase' }}>Código Copia e Cola</p>
-                                    <div style={{ fontSize: 11, wordBreak: 'break-all', fontFamily: 'monospace', color: 'var(--gold)', marginBottom: 16 }}>{pixData.qr_code}</div>
-                                    <button onClick={() => { navigator.clipboard.writeText(pixData.qr_code); setStatusMsg({ type: 'success', text: 'Código copiado!' }) }} className="btn-outline" style={{ width: '100%', fontSize: 13 }}>COPIAR CÓDIGO</button>
-                                </div>
-                                <p style={{ fontSize: 13, color: 'var(--muted)' }}>Aguardando pagamento... (Aprovação instantânea)</p>
-                            </div>
-                        )}
+                    </div>
 
-                        {payment === 'cartao' && (
-                            <div className="fade-up" style={{ textAlign: 'left' }}>
-                                <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 32, textAlign: 'center' }}>Dados do Cartão</h1>
-                                <form onSubmit={processCardPayment} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                    <div>
-                                        <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO CARTÃO</label>
-                                        <input required type="text" placeholder="0000 0000 0000 0000" value={cardData.cardNumber} onChange={e => setCardData({ ...cardData, cardNumber: maskCard(e.target.value) })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                    <Link href="/" onClick={() => clearCart()} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-block', width: '100%', padding: 18 }}>VOLTAR PARA A LOJA</Link>
+                </div>
+            ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: step === 1 ? '1.5fr 1fr' : '1fr', gap: 48 }}>
+                    {step === 1 ? (
+                        <>
+                            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 24, padding: 48 }}>
+                                <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 32, fontFamily: 'var(--font-display)' }}>Finalizar Pedido</h1>
+                                <form onSubmit={handleNextStep} style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>MÊS (MM)</label>
-                                            <input required type="text" placeholder="01" maxLength={2} value={cardData.cardExpirationMonth} onChange={e => setCardData({ ...cardData, cardExpirationMonth: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 10 }}>Seu Nick</label>
+                                            <input required type="text" value={nick} onChange={e => setNick(e.target.value)} placeholder="Ex: Notch" style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, color: '#fff' }} />
                                         </div>
                                         <div>
-                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>ANO (AA)</label>
-                                            <input required type="text" placeholder="28" maxLength={2} value={cardData.cardExpirationYear} onChange={e => setCardData({ ...cardData, cardExpirationYear: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
-                                        </div>
-                                        <div>
-                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>CVV</label>
-                                            <input required type="text" placeholder="123" maxLength={4} value={cardData.securityCode} onChange={e => setCardData({ ...cardData, securityCode: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 10 }}>Seu E-mail</label>
+                                            <input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="voce@exemplo.com" style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, color: '#fff' }} />
                                         </div>
                                     </div>
                                     <div>
-                                        <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NOME IMPRESSO NO CARTÃO</label>
-                                        <input required type="text" placeholder="JOÃO D SILVA" value={cardData.cardholderName} onChange={e => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
-                                    </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
-                                        <div>
-                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>TIPO</label>
-                                            <select value={cardData.identificationType} onChange={e => setCardData({ ...cardData, identificationType: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' fill=\'white\' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(100% - 15px) center' }}>
-                                                <option value="CPF" style={{ background: '#1a1a1a', color: '#fff' }}>CPF</option>
-                                                <option value="CNPJ" style={{ background: '#1a1a1a', color: '#fff' }}>CNPJ</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO DOCUMENTO</label>
-                                            <input required type="text" placeholder="000.000.000-00" value={cardData.identificationNumber} onChange={e => setCardData({ ...cardData, identificationNumber: maskDoc(e.target.value, cardData.identificationType) })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 16 }}>Forma de Pagamento</label>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                                            {[
+                                                { id: 'pix', label: 'Pix Instantâneo' },
+                                                { id: 'cartao', label: 'Cartão de Crédito' }
+                                            ].map(m => (
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                <div key={m.id} onClick={() => setPayment(m.id as any)} style={{ padding: '20px 16px', borderRadius: 16, border: '1px solid', borderColor: payment === m.id ? 'var(--gold)' : 'var(--border)', background: payment === m.id ? 'rgba(245, 166, 35, 0.05)' : 'transparent', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' }}>
+                                                    <div style={{ color: payment === m.id ? 'var(--gold)' : '#fff', fontWeight: 700, fontSize: 13 }}>{m.label}</div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                     <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: 18, fontSize: 16, marginTop: 12 }}>
-                                        {loading ? 'PROCESSANDO...' : 'PAGAR AGORA'}
+                                        {loading ? 'PROCESSANDO...' : 'REVISAR PEDIDO'}
                                     </button>
                                 </form>
                             </div>
-                        )}
+                            <div style={{ background: 'rgba(245, 166, 35, 0.03)', border: '1px solid var(--border)', borderRadius: 24, padding: 32, height: 'fit-content' }}>
+                                <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 24 }}>Resumo</h2>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+                                    {cart.map(item => (
+                                        <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+                                            <span style={{ color: 'var(--muted)' }}>{item.quantity}x {item.nome}</span>
+                                            <span style={{ color: '#fff', fontWeight: 600 }}>R$ {(item.preco * item.quantity).toFixed(2)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: 16, fontWeight: 600, color: '#fff' }}>Total</span>
+                                    <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--gold)' }}>R$ {total.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto', background: 'var(--surface)', padding: '64px 32px', borderRadius: 32, border: '1px solid var(--border)' }}>
+                            {payment === 'pix' && pixData && (
+                                <div className="fade-up">
+                                    <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 24 }}>Finalize seu PIX</h1>
+                                    <div style={{ background: '#fff', padding: 12, borderRadius: 12, display: 'inline-block', marginBottom: 24 }}>
+                                        <img src={`data:image/png;base64,${pixData.qr_code_base64}`} alt="PIX" style={{ width: 180, height: 180 }} />
+                                    </div>
+                                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', padding: 16, borderRadius: 12, marginBottom: 24 }}>
+                                        <p style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 8, textTransform: 'uppercase' }}>Código Copia e Cola</p>
+                                        <div style={{ fontSize: 11, wordBreak: 'break-all', fontFamily: 'monospace', color: 'var(--gold)', marginBottom: 16 }}>{pixData.qr_code}</div>
+                                        <button onClick={() => { navigator.clipboard.writeText(pixData.qr_code); setStatusMsg({ type: 'success', text: 'Código copiado!' }) }} className="btn-outline" style={{ width: '100%', fontSize: 13 }}>COPIAR CÓDIGO</button>
+                                    </div>
+                                    <p style={{ fontSize: 13, color: 'var(--muted)' }}>Aguardando pagamento... (Aprovação instantânea)</p>
+                                    <button onClick={() => { setStep(1); setStatusMsg(null); }} style={{ marginTop: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, textDecoration: 'underline' }}>CANCELAR E VOLTAR</button>
+                                </div>
+                            )}
 
-                        <button onClick={() => { setStep(1); setStatusMsg(null); }} style={{ marginTop: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, textDecoration: 'underline' }}>
-                            CANCELAR E VOLTAR
-                        </button>
-                    </div>
-                )}
-            </div>
+                            {payment === 'cartao' && (
+                                <div className="fade-up" style={{ textAlign: 'left' }}>
+                                    <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 32, textAlign: 'center' }}>Dados do Cartão</h1>
+                                    <form onSubmit={processCardPayment} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO CARTÃO</label>
+                                            <input required type="text" placeholder="0000 0000 0000 0000" value={cardData.cardNumber} onChange={e => setCardData({ ...cardData, cardNumber: maskCard(e.target.value) })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>MÊS (MM)</label>
+                                                <input required type="text" placeholder="01" maxLength={2} value={cardData.cardExpirationMonth} onChange={e => setCardData({ ...cardData, cardExpirationMonth: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>ANO (AA)</label>
+                                                <input required type="text" placeholder="28" maxLength={2} value={cardData.cardExpirationYear} onChange={e => setCardData({ ...cardData, cardExpirationYear: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>CVV</label>
+                                                <input required type="text" placeholder="123" maxLength={4} value={cardData.securityCode} onChange={e => setCardData({ ...cardData, securityCode: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NOME IMPRESSO NO CARTÃO</label>
+                                            <input required type="text" placeholder="JOÃO D SILVA" value={cardData.cardholderName} onChange={e => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>TIPO</label>
+                                                <select value={cardData.identificationType} onChange={e => setCardData({ ...cardData, identificationType: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' fill=\'white\' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(100% - 15px) center' }}>
+                                                    <option value="CPF" style={{ background: '#1a1a1a', color: '#fff' }}>CPF</option>
+                                                    <option value="CNPJ" style={{ background: '#1a1a1a', color: '#fff' }}>CNPJ</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO DOCUMENTO</label>
+                                                <input required type="text" placeholder="000.000.000-00" value={cardData.identificationNumber} onChange={e => setCardData({ ...cardData, identificationNumber: maskDoc(e.target.value, cardData.identificationType) })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
+                                            </div>
+                                        </div>
+                                        <button className="btn-primary" type="submit" disabled={loading} style={{ width: '100%', padding: 18, fontSize: 16, marginTop: 12 }}>
+                                            {loading ? 'PROCESSANDO...' : 'PAGAR AGORA'}
+                                        </button>
+                                        <button type="button" onClick={() => { setStep(1); setStatusMsg(null); }} style={{ marginTop: 10, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, textDecoration: 'underline', textAlign: 'center' }}>CANCELAR E VOLTAR</button>
+                                    </form>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
         </main>
     );
 }
