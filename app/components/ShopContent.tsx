@@ -33,12 +33,12 @@ export default function ShopContent({
   servidores: Servidor[]
 }) {
   const [selectedCat, setSelectedCat] = useState<number | null>(null);
-  const [selectedServ, setSelectedServ] = useState<number | null>(servidores[0]?.id || null);
+  const [selectedServ, setSelectedServ] = useState<number | null>(null);
   const { addToCart, setIsCartOpen } = useCart();
 
   const filteredProdutos = produtos.filter(p => {
-    const matchesServ = selectedServ ? p.servidorId === selectedServ : true;
-    const matchesCat = selectedCat ? p.categoriaId === selectedCat : true;
+    const matchesServ = selectedServ !== null ? p.servidorId === selectedServ : true;
+    const matchesCat = selectedCat !== null ? p.categoriaId === selectedCat : true;
     return matchesServ && matchesCat;
   });
 
@@ -58,6 +58,23 @@ export default function ShopContent({
                 Servidores
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 40 }}>
+                <button 
+                    onClick={() => { setSelectedServ(null); setSelectedCat(null); }}
+                    style={{
+                        textAlign: 'left',
+                        padding: '12px 16px',
+                        borderRadius: 12,
+                        background: selectedServ === null ? 'var(--gold-linear)' : 'transparent',
+                        color: selectedServ === null ? '#000' : 'var(--muted)',
+                        cursor: 'pointer',
+                        fontSize: 14,
+                        fontWeight: selectedServ === null ? 700 : 500,
+                        transition: 'all 0.2s',
+                        border: 'none'
+                    }}
+                >
+                    Todos os Servidores
+                </button>
                 {servidores.map(serv => (
                     <button 
                         key={serv.id}
@@ -67,13 +84,12 @@ export default function ShopContent({
                             padding: '12px 16px',
                             borderRadius: 12,
                             background: selectedServ === serv.id ? 'var(--gold-linear)' : 'transparent',
-                            border: '1px solid',
-                            borderColor: selectedServ === serv.id ? 'transparent' : 'transparent',
                             color: selectedServ === serv.id ? '#000' : 'var(--muted)',
                             cursor: 'pointer',
                             fontSize: 14,
                             fontWeight: selectedServ === serv.id ? 700 : 500,
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s',
+                            border: 'none'
                         }}
                     >
                         {serv.nome}
