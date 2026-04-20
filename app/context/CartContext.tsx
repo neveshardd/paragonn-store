@@ -6,6 +6,7 @@ type Produto = {
   id: number;
   nome: string;
   preco: number;
+  comando?: string;
 };
 
 type CartItem = Produto & { quantity: number };
