@@ -7,25 +7,24 @@ const client = new MercadoPagoConfig({
 
 export async function POST(request: Request) {
   try {
-    const { token, issuer_id, payment_method_id, transaction_amount, installments, payer, metadata } = await request.json();
+    const { token, payment_method_id, transaction_amount, installments, payer, metadata } = await request.json();
 
     const dashUrl = process.env.NEXT_PUBLIC_DASH_URL || '';
     const notificationUrl = dashUrl.includes('localhost') ? undefined : `${dashUrl}/api/webhooks/mercadopago`;
 
     const payment = new Payment(client);
     
-    const result = await payment.create({
-      body: {
+    const body = {
         token,
-        issuer_id,
         payment_method_id,
         transaction_amount,
-        installments,
+        installments: Number(installments),
         payer,
         metadata,
         notification_url: notificationUrl,
-      }
-    });
+    };
+
+    const result = await payment.create({ body });
 
     return NextResponse.json({ 
         status: result.status, 
@@ -33,8 +32,17 @@ export async function POST(request: Request) {
         detail: result.status_detail 
     });
 
-  } catch (error) {
-    console.error('Process Payment Error:', error);
-    return NextResponse.json({ error: 'Erro ao processar pagamento com cartão' }, { status: 500 });
+  } catch (error: any) {
+    console.error('--- MERCADO PAGO ERROR LOG ---');
+    if (error.cause) {
+        console.error('CAUSES:', JSON.stringify(error.cause, null, 2));
+    }
+    console.error('MESSAGE:', error.message);
+    
+    return NextResponse.json({ 
+        error: 'Erro ao processar pagamento com cartão',
+        message: error.message,
+        details: error.cause?.[0]?.description || 'Erro interno no gateway'
+    }, { status: 500 });
   }
 }

@@ -17,9 +17,9 @@ export default function CheckoutPage() {
     const [email, setEmail] = useState("");
     const [payment, setPayment] = useState<"pix" | "cartao" | null>(null);
     const [loading, setLoading] = useState(false);
+    const [statusMsg, setStatusMsg] = useState<{ type: 'error' | 'success', text: string } | null>(null);
     const [pixData, setPixData] = useState<{ qr_code: string, qr_code_base64: string } | null>(null);
 
-    // Estado do formulário de cartão
     const [cardData, setCardData] = useState({
         cardNumber: "",
         cardExpirationMonth: "",
@@ -31,21 +31,18 @@ export default function CheckoutPage() {
     });
 
     useEffect(() => {
-        // Carrega o script do MP se não existir
         if (typeof window !== "undefined" && !window.MercadoPago) {
             const script = document.createElement('script');
             script.src = "https://sdk.mercadopago.com/js/v2";
-            script.onload = () => {
-                console.log("Mercado Pago SDK carregado");
-            };
             document.body.appendChild(script);
         }
     }, []);
 
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
+        setStatusMsg(null);
         if (!nick || !email || !payment) {
-            alert("Preencha todos os campos!");
+            setStatusMsg({ type: 'error', text: 'Preencha todos os campos!' });
             return;
         }
         
@@ -59,21 +56,19 @@ export default function CheckoutPage() {
     const processCardPayment = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
+        setStatusMsg(null);
 
         try {
             const mp = new window.MercadoPago(process.env.NEXT_PUBLIC_MP_PUBLIC_KEY);
-            
             const cleanCardNumber = cardData.cardNumber.replace(/\s/g, "");
             const cleanIdentificationNumber = cardData.identificationNumber.replace(/\D/g, "");
 
-            // Detecção básica de bandeira
             let paymentMethod = 'master';
             if (cleanCardNumber.startsWith('4')) paymentMethod = 'visa';
             else if (cleanCardNumber.startsWith('3')) paymentMethod = 'amex';
             else if (cleanCardNumber.startsWith('6') || cleanCardNumber.startsWith('50')) paymentMethod = 'elo';
             else if (cleanCardNumber.startsWith('5')) paymentMethod = 'master';
 
-            // Cria o token do cartão de forma transparente
             const tokenResponse = await mp.createCardToken({
                 cardNumber: cleanCardNumber,
                 cardExpirationMonth: cardData.cardExpirationMonth,
@@ -93,24 +88,22 @@ export default function CheckoutPage() {
                         transaction_amount: total,
                         payment_method_id: paymentMethod, 
                         installments: 1,
-                        payer: { email },
+                        payer: { email, identification: { type: cardData.identificationType, number: cleanIdentificationNumber } },
                         metadata: { nick, items: JSON.stringify(cart.map(i => ({ id: i.id, cmd: i.comando }))) }
                     })
                 });
                 const data = await res.json();
                 if (data.status === 'approved') {
-                    alert("Pagamento Aprovado!");
-                    setStep(1); clearCart();
+                    setStatusMsg({ type: 'success', text: 'Pagamento Aprovado! Itens entregues.' });
+                    setTimeout(() => { setStep(1); clearCart(); }, 3000);
                 } else {
-                    alert("Pagamento " + (data.status || 'recusado') + ": " + (data.detail || 'Verifique os dados'));
+                    setStatusMsg({ type: 'error', text: `Pagamento ${data.status || 'recusado'}: ${data.detail || 'Verifique seus dados'}` });
                 }
             } else {
-                const errorMsg = tokenResponse.cause?.[0]?.message || "Dados do cartão inválidos";
-                alert("Erro: " + errorMsg);
+                setStatusMsg({ type: 'error', text: tokenResponse.cause?.[0]?.message || "Dados do cartão inválidos" });
             }
         } catch (err) {
-            console.error(err);
-            alert("Erro na conexão com o Mercado Pago");
+            setStatusMsg({ type: 'error', text: 'Erro na conexão com o Mercado Pago' });
         } finally {
             setLoading(false);
         }
@@ -118,6 +111,7 @@ export default function CheckoutPage() {
 
     const generatePix = async () => {
         setLoading(true);
+        setStatusMsg(null);
         try {
             const res = await fetch('/api/checkout', {
                 method: 'POST',
@@ -130,16 +124,16 @@ export default function CheckoutPage() {
                 setStep(2);
                 clearCart();
             } else {
-                alert(data.error || "Erro ao gerar PIX");
+                setStatusMsg({ type: 'error', text: data.error || "Erro ao gerar PIX" });
             }
         } catch (err) {
-            alert("Erro ao conectar com a API");
+            setStatusMsg({ type: 'error', text: "Erro ao conectar com a API" });
         } finally {
             setLoading(false);
         }
     };
 
-    if (cart.length === 0 && step === 1) {
+    if (cart.length === 0 && step === 1 && !statusMsg) {
         return (
             <main style={{ minHeight: '80vh', paddingTop: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '180px 24px' }}>
                 <h1 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 16 }}>Seu carrinho está vazio</h1>
@@ -151,6 +145,13 @@ export default function CheckoutPage() {
 
     return (
         <main style={{ minHeight: '100vh', paddingTop: 180, paddingBottom: 100, maxWidth: 1000, margin: '0 auto', padding: '180px 24px 100px' }}>
+            
+            {statusMsg && (
+                <div style={{ padding: 20, borderRadius: 12, marginBottom: 32, textAlign: 'center', background: statusMsg.type === 'success' ? 'rgba(0, 255, 100, 0.1)' : 'rgba(255, 50, 50, 0.1)', border: `1px solid ${statusMsg.type === 'success' ? '#00ff64' : '#ff3232'}`, color: statusMsg.type === 'success' ? '#00ff64' : '#ff3232' }}>
+                    {statusMsg.text}
+                </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: step === 1 ? '1.5fr 1fr' : '1fr', gap: 48 }}>
 
                 {step === 1 ? (
@@ -214,7 +215,7 @@ export default function CheckoutPage() {
                                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', padding: 16, borderRadius: 12, marginBottom: 24 }}>
                                     <p style={{ color: 'var(--muted)', fontSize: 12, marginBottom: 8, textTransform: 'uppercase' }}>Código Copia e Cola</p>
                                     <div style={{ fontSize: 11, wordBreak: 'break-all', fontFamily: 'monospace', color: 'var(--gold)', marginBottom: 16 }}>{pixData.qr_code}</div>
-                                    <button onClick={() => { navigator.clipboard.writeText(pixData.qr_code); alert("Copiado!"); }} className="btn-outline" style={{ width: '100%', fontSize: 13 }}>COPIAR CÓDIGO</button>
+                                    <button onClick={() => { navigator.clipboard.writeText(pixData.qr_code); setStatusMsg({ type: 'success', text: 'Código copiado!' }) }} className="btn-outline" style={{ width: '100%', fontSize: 13 }}>COPIAR CÓDIGO</button>
                                 </div>
                                 <p style={{ fontSize: 13, color: 'var(--muted)' }}>Aguardando pagamento... (Aprovação instantânea)</p>
                             </div>
@@ -266,7 +267,7 @@ export default function CheckoutPage() {
                             </div>
                         )}
 
-                        <button onClick={() => setStep(1)} style={{ marginTop: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, textDecoration: 'underline' }}>
+                        <button onClick={() => { setStep(1); setStatusMsg(null); }} style={{ marginTop: 40, background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: 13, textDecoration: 'underline' }}>
                             CANCELAR E VOLTAR
                         </button>
                     </div>
