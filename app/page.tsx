@@ -1,7 +1,7 @@
 import ShopContent from "./components/ShopContent";
 import GoalProgress from "./components/GoalProgress";
 
-const WEBPANEL = process.env.WEBPANEL_URL ?? "http://localhost:5173";
+const WEBPANEL = process.env.NEXT_PUBLIC_DASH_URL ?? "http://localhost:5173";
 
 async function getProdutos() {
   try {
@@ -37,7 +37,7 @@ async function getServidores() {
 }
 async function getGoal() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/goal`, { next: { revalidate: 0 } });
+    const res = await fetch(`${WEBPANEL}/api/goal`, { next: { revalidate: 10 } });
     if (!res.ok) return null;
     return res.json();
   } catch (err) {
@@ -60,12 +60,11 @@ export default async function Home() {
         {/* Header Section (Centralizado) */}
         <section style={{ marginBottom: 80, textAlign: 'center' }}>
           <div className="fade-up">
-            <span className="section-label">Loja Oficial Paragonn</span>
             <h1 className="section-title">
               Sua jornada começa <span className="text-gold">aqui.</span>
             </h1>
             <p style={{ maxWidth: 600, margin: '0 auto 32px', color: 'var(--muted)', fontSize: 17, lineHeight: 1.7 }}>
-              Explore nossa coleção de itens, vantagens e pacotes exclusivos. 
+              Explore nossa coleção de itens, vantagens e pacotes exclusivos.
               Todo o lucro é reinvestido na melhoria contínua dos nossos servidores.
             </p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
@@ -87,7 +86,7 @@ export default async function Home() {
 
         {/* Meta no final */}
         <section className="fade-up" style={{ maxWidth: 800, margin: '80px auto 0' }}>
-            <GoalProgress target={goal?.target} current={goal?.current} />
+          <GoalProgress target={goal?.target} current={goal?.current} />
         </section>
       </div>
     </main>

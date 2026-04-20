@@ -1,10 +1,17 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import Link from "next/link";
 
 export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   const { cart, removeFromCart, total } = useCart();
+  const router = useRouter();
+
+  const handleContinueShopping = () => {
+    onClose();
+    router.push('/');
+  };
 
   if (!isOpen) return null;
 
@@ -39,7 +46,7 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean, onCl
                     <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted)' }}>
                         <p style={{ marginBottom: 24 }}>Seu carrinho está vazio.</p>
                         <button 
-                            onClick={onClose}
+                            onClick={handleContinueShopping}
                             style={{ 
                                 background: 'var(--gold)', 
                                 border: 'none', 
@@ -92,7 +99,7 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean, onCl
                     </Link>
 
                     <button 
-                        onClick={onClose}
+                        onClick={handleContinueShopping}
                         style={{ 
                             width: '100%', 
                             marginTop: 12, 

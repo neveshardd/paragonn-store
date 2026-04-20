@@ -13,20 +13,14 @@ export default function Footer() {
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 64,
-          marginBottom: 64
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: 60,
+          marginBottom: 60
         }}>
-          {/* Brand */}
-          <div style={{ textAlign: 'left' }}>
-            <Image
-              src="/logo.png"
-              alt="Paragonn"
-              width={140}
-              height={48}
-              style={{ width: 'auto', height: '40px', marginBottom: 24, opacity: 0.8 }}
-            />
-            <p style={{ color: "#7a7590", fontSize: 14, lineHeight: 1.7, maxWidth: 300 }}>
+          {/* Info */}
+          <div>
+            <h3 style={{ fontSize: 13, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 24, fontFamily: 'var(--font-display)' }}>Sobre a Loja</h3>
+            <p style={{ color: "#7a7590", fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>
               A loja oficial do servidor Paragonn. Qualidade, segurança e os melhores benefícios exclusivos para sua aventura com a gente.
             </p>
           </div>
@@ -51,10 +45,9 @@ export default function Footer() {
             <p style={{ color: "#7a7590", fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>
               Aceitamos diversas formas de pagamento processadas com segurança total.
             </p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <Image src="/image-pix.png" alt="Pix" width={32} height={24} style={{ height: 24, width: 'auto', opacity: 0.8 }} />
-              <Image src="/mp.png" alt="Mercado Pago" width={48} height={32} style={{ height: 32, width: 'auto', opacity: 0.8 }} />
-              <Image src="/credit-card.png" alt="Cartão" width={48} height={32} style={{ height: 32, width: 'auto', opacity: 0.8 }} />
+            <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+              <img src="https://logopng.com.br/logos/pix-106.png" alt="Pix" style={{ height: 18, filter: 'invert(1) hue-rotate(180deg) saturate(2)' }} />
+              <img src="https://logodownload.org/wp-content/uploads/2019/06/mercado-pago-logo-1.png" alt="Mercado Pago" style={{ height: 28 }} />
             </div>
           </div>
         </div>
