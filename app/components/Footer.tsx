@@ -1,5 +1,4 @@
-import Image from "next/image";
-
+/* eslint-disable @next/next/no-img-element */
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -10,15 +9,15 @@ export default function Footer() {
       padding: "80px 24px 40px",
       marginTop: "auto"
     }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{
+      <div className="container">
+        <div className="footer-grid" style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr 1fr",
           gap: 60,
           marginBottom: 60
         }}>
           {/* Info */}
-          <div>
+          <div className="footer-col">
             <h3 style={{ fontSize: 13, fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 24, fontFamily: 'var(--font-display)' }}>Sobre a Loja</h3>
             <p style={{ color: "#7a7590", fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>
               A loja oficial do servidor Paragonn. Qualidade, segurança e os melhores benefícios exclusivos para sua aventura com a gente.
@@ -26,7 +25,7 @@ export default function Footer() {
           </div>
 
           {/* Links */}
-          <div>
+          <div className="footer-col">
             <h4 style={{ color: "#fff", fontSize: 13, fontWeight: 700, marginBottom: 28, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Institucional
             </h4>
@@ -38,7 +37,7 @@ export default function Footer() {
           </div>
 
           {/* Pagamento */}
-          <div>
+          <div className="footer-col">
             <h4 style={{ color: "#fff", fontSize: 13, fontWeight: 700, marginBottom: 28, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               Pagamento Seguro
             </h4>
@@ -67,6 +66,14 @@ export default function Footer() {
           </span>
         </div>
       </div>
+
+      <style>{`
+          @media (max-width: 900px) {
+              .footer-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+              .footer-col { text-align: center; }
+              .footer-col div { justify-content: center !important; }
+          }
+      `}</style>
     </footer>
   );
 }

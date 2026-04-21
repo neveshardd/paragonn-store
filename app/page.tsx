@@ -57,19 +57,19 @@ export default async function Home() {
   ]);
 
   return (
-    <main style={{ minHeight: '100vh', paddingTop: 160, paddingBottom: 100, background: 'var(--bg)' }}>
+    <main className="main-content" style={{ minHeight: '100vh', paddingBottom: 100, background: 'var(--bg)' }}>
       <div className="container">
         {/* Header Section (Centralizado) */}
-        <section style={{ marginBottom: 80, textAlign: 'center' }}>
+        <section className="hero-section" style={{ marginBottom: 80, textAlign: 'center' }}>
           <div className="fade-up">
             <h1 className="section-title">
               Sua jornada começa <span className="text-gold">aqui.</span>
             </h1>
-            <p style={{ maxWidth: 600, margin: '0 auto 32px', color: 'var(--muted)', fontSize: 17, lineHeight: 1.7 }}>
+            <p className="hero-description" style={{ maxWidth: 600, margin: '0 auto 32px', color: 'var(--muted)', fontSize: 17, lineHeight: 1.7 }}>
               Explore nossa coleção de itens, vantagens e pacotes exclusivos.
               Todo o lucro é reinvestido na melhoria contínua dos nossos servidores.
             </p>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+            <div className="hero-buttons" style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
               <a href="#produtos" className="btn-primary">VER PRODUTOS</a>
               <a href="https://discord.gg/paragonn" target="_blank" className="btn-outline">NOSSO DISCORD</a>
             </div>
@@ -77,20 +77,31 @@ export default async function Home() {
         </section>
 
         {/* Divisor */}
-        <div style={{ height: 1, background: 'linear-gradient(to right, transparent, var(--border), transparent)', marginBottom: 80 }}></div>
+        <div className="section-divider" style={{ height: 1, background: 'linear-gradient(to right, transparent, var(--border), transparent)', marginBottom: 80 }}></div>
 
         <section id="produtos" style={{ marginBottom: 80 }}>
           <ShopContent produtos={produtos} categorias={categorias} servidores={servidores} />
         </section>
 
         {/* Divisor */}
-        <div style={{ height: 1, background: 'linear-gradient(to right, transparent, var(--border), transparent)', marginTop: 80 }}></div>
+        <div className="section-divider" style={{ height: 1, background: 'linear-gradient(to right, transparent, var(--border), transparent)', marginTop: 80 }}></div>
 
         {/* Meta no final */}
         <section className="fade-up" style={{ maxWidth: 800, margin: '80px auto 0' }}>
           <GoalProgress target={goal?.target} current={goal?.current} />
         </section>
       </div>
+
+      <style>{`
+          .main-content { padding-top: 160px; }
+          @media (max-width: 768px) {
+              .main-content { padding-top: 120px; }
+              .hero-section { margin-bottom: 60px !important; }
+              .hero-description { font-size: 15px !important; margin-bottom: 24px !important; }
+              .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
+              .section-divider { margin-bottom: 40px !important; margin-top: 40px !important; }
+          }
+      `}</style>
     </main>
   );
 }

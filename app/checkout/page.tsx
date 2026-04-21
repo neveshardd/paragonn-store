@@ -148,7 +148,7 @@ export default function CheckoutPage() {
     }
 
     return (
-        <main style={{ minHeight: '100vh', paddingTop: 180, paddingBottom: 100, maxWidth: 1000, margin: '0 auto', padding: '180px 24px 100px' }}>
+        <main className="checkout-main" style={{ minHeight: '100vh', paddingBottom: 100, maxWidth: 1200, margin: '0 auto' }}>
 
             {statusMsg && (
                 <div style={{ padding: 20, borderRadius: 12, marginBottom: 32, textAlign: 'center', background: statusMsg.type === 'success' ? 'rgba(0, 255, 100, 0.1)' : 'rgba(255, 50, 50, 0.1)', border: `1px solid ${statusMsg.type === 'success' ? '#00ff64' : '#ff3232'}`, color: statusMsg.type === 'success' ? '#00ff64' : '#ff3232' }}>
@@ -157,11 +157,11 @@ export default function CheckoutPage() {
             )}
 
             {step === 3 ? (
-                <div className="fade-up" style={{ textAlign: 'center', background: 'var(--surface)', padding: 64, borderRadius: 32, border: '1px solid var(--border)', maxWidth: 600, margin: '0 auto' }}>
+                <div className="fade-up success-container" style={{ textAlign: 'center', background: 'var(--surface)', padding: 64, borderRadius: 32, border: '1px solid var(--border)', maxWidth: 600, margin: '0 auto' }}>
                     <div style={{ width: 80, height: 80, background: 'rgba(0, 255, 100, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 32px' }}>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#00ff64" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
-                    <h1 style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 16 }}>Pagamento Aprovado!</h1>
+                    <h1 className="success-title" style={{ fontSize: 32, fontWeight: 800, color: '#fff', marginBottom: 16 }}>Pagamento Aprovado!</h1>
                     <p style={{ color: 'var(--muted)', fontSize: 16, marginBottom: 32, lineHeight: 1.6 }}>Obrigado, <strong style={{ color: '#fff' }}>{nick}</strong>! Sua compra foi processada com sucesso e os itens já estão sendo enviados para o servidor.</p>
 
                     <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 16, padding: 24, marginBottom: 40, textAlign: 'left' }}>
@@ -178,13 +178,13 @@ export default function CheckoutPage() {
                     <Link href="/" onClick={() => clearCart()} className="btn-primary" style={{ textDecoration: 'none', display: 'inline-block', width: '100%', padding: 18 }}>VOLTAR PARA A LOJA</Link>
                 </div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: step === 1 ? '1.5fr 1fr' : '1fr', gap: 48 }}>
+                <div className="checkout-grid" style={{ display: 'grid', gridTemplateColumns: step === 1 ? '1.5fr 1fr' : '1fr', gap: 48 }}>
                     {step === 1 ? (
                         <>
-                            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 24, padding: 48 }}>
+                            <div className="checkout-form-container" style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 24, padding: 48 }}>
                                 <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 32, fontFamily: 'var(--font-display)' }}>Finalizar Pedido</h1>
                                 <form onSubmit={handleNextStep} style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
                                         <div>
                                             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 10 }}>Seu Nick</label>
                                             <input required type="text" value={nick} onChange={e => setNick(e.target.value)} placeholder="Ex: Notch" style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, color: '#fff' }} />
@@ -196,7 +196,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <div>
                                         <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 16 }}>Forma de Pagamento</label>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                                        <div className="payment-methods" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
                                             {[
                                                 { id: 'pix', label: 'Pix Instantâneo' },
                                                 { id: 'cartao', label: 'Cartão de Crédito' }
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                                     </button>
                                 </form>
                             </div>
-                            <div style={{ background: 'rgba(245, 166, 35, 0.03)', border: '1px solid var(--border)', borderRadius: 24, padding: 32, height: 'fit-content' }}>
+                            <div className="checkout-summary" style={{ background: 'rgba(245, 166, 35, 0.03)', border: '1px solid var(--border)', borderRadius: 24, padding: 32, height: 'fit-content' }}>
                                 <h2 style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 24 }}>Resumo</h2>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
                                     {cart.map(item => (
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
                             </div>
                         </>
                     ) : (
-                        <div style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto', background: 'var(--surface)', padding: '64px 32px', borderRadius: 32, border: '1px solid var(--border)' }}>
+                        <div className="payment-step-container" style={{ textAlign: 'center', maxWidth: 600, margin: '0 auto', background: 'var(--surface)', padding: '64px 32px', borderRadius: 32, border: '1px solid var(--border)' }}>
                             {payment === 'pix' && pixData && (
                                 <div className="fade-up">
                                     <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 24 }}>Finalize seu PIX</h1>
@@ -255,7 +255,7 @@ export default function CheckoutPage() {
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NÚMERO DO CARTÃO</label>
                                             <input required type="text" placeholder="0000 0000 0000 0000" value={cardData.cardNumber} onChange={e => setCardData({ ...cardData, cardNumber: maskCard(e.target.value) })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                                        <div className="card-extra-info" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
                                             <div>
                                                 <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>MÊS (MM)</label>
                                                 <input required type="text" placeholder="01" maxLength={2} value={cardData.cardExpirationMonth} onChange={e => setCardData({ ...cardData, cardExpirationMonth: e.target.value.replace(/\D/g, "") })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                                             <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>NOME IMPRESSO NO CARTÃO</label>
                                             <input required type="text" placeholder="JOÃO D SILVA" value={cardData.cardholderName} onChange={e => setCardData({ ...cardData, cardholderName: e.target.value.toUpperCase() })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff' }} />
                                         </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
+                                        <div className="doc-info" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16 }}>
                                             <div>
                                                 <label style={{ display: 'block', fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>TIPO</label>
                                                 <select value={cardData.identificationType} onChange={e => setCardData({ ...cardData, identificationType: e.target.value })} style={{ width: '100%', padding: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 10, color: '#fff', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' fill=\'white\' viewBox=\'0 0 16 16\'%3E%3Cpath d=\'M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'calc(100% - 15px) center' }}>
@@ -297,6 +297,25 @@ export default function CheckoutPage() {
                     )}
                 </div>
             )}
+
+            <style>{`
+                .checkout-main { padding-top: 180px; padding-left: 24px; padding-right: 24px; }
+                @media (max-width: 900px) {
+                    .checkout-main { padding-top: 120px; }
+                    .checkout-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+                    .checkout-form-container { padding: 32px !important; }
+                    .form-row { grid-template-columns: 1fr !important; gap: 20px !important; }
+                    .payment-methods { grid-template-columns: 1fr !important; }
+                }
+                @media (max-width: 600px) {
+                    .checkout-form-container { padding: 24px !important; border-radius: 20px !important; }
+                    .success-container { padding: 40px 24px !important; border-radius: 24px !important; }
+                    .success-title { fontSize: 24px !important; }
+                    .payment-step-container { padding: 40px 20px !important; border-radius: 24px !important; }
+                    .card-extra-info { grid-template-columns: 1fr !important; }
+                    .doc-info { grid-template-columns: 1fr !important; }
+                }
+            `}</style>
         </main>
     );
 }
