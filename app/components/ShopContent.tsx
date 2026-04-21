@@ -181,11 +181,26 @@ export default function ShopContent({
                             display: 'flex', 
                             alignItems: 'center', 
                             justifyContent: 'center',
-                            borderBottom: '1px solid var(--border)'
+                            borderBottom: '1px solid var(--border)',
+                            overflow: 'hidden'
                         }}>
-                            <div style={{ fontSize: 72, filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))' }}>
-                                {prod.categoriaId === 1 ? '💎' : prod.categoriaId === 2 ? '⚔️' : '🎁'}
-                            </div>
+                            {prod.imagem ? (
+                              <img 
+                                src={prod.imagem} 
+                                alt={prod.nome} 
+                                style={{ 
+                                  width: '100%', 
+                                  height: '100%', 
+                                  objectFit: 'cover',
+                                  transition: 'transform 0.5s ease'
+                                }} 
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <div style={{ fontSize: 72, filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))' }}>
+                                  {prod.categoriaId === 1 ? '💎' : prod.categoriaId === 2 ? '⚔️' : '🎁'}
+                              </div>
+                            )}
                             <div style={{ 
                                 position: 'absolute', 
                                 bottom: 16, 
@@ -196,7 +211,8 @@ export default function ShopContent({
                                 borderRadius: 100, 
                                 fontSize: 10, 
                                 fontWeight: 900,
-                                textTransform: 'uppercase'
+                                textTransform: 'uppercase',
+                                pointerEvents: 'none'
                             }}>
                                 {servidores.find(s => s.id === prod.servidorId)?.nome}
                             </div>
