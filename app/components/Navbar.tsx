@@ -54,9 +54,9 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Links */}
-        <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 36 }}>
+        <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <a href={webUrl} style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Voltar ao Site</a>
-          <Link href="/" style={{ fontSize: 13, fontWeight: 600, color: "#fff", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Loja</Link>
+          
           <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
 
           <button
@@ -79,12 +79,11 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bg)', padding: 24, borderBottom: '1px solid var(--border)' }}>
-          <a href={webUrl} style={{ display: 'block', color: 'var(--muted)', padding: '12px 0', textDecoration: 'none' }}>Voltar ao Site</a>
-          <Link href="/" style={{ display: 'block', color: '#fff', padding: '12px 0', textDecoration: 'none' }}>Início Loja</Link>
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(12, 11, 15, 0.98)', backdropFilter: 'blur(16px)', padding: 24, borderBottom: '1px solid var(--border)', zIndex: 100 }}>
+          <a href={webUrl} style={{ display: 'block', textAlign: 'center', color: '#fff', padding: '16px 0', textDecoration: 'none', fontWeight: 600 }}>Voltar ao Site</a>
           <button
             onClick={() => { setIsCartOpen(true); setMenuOpen(false); }}
-            style={{ width: '100%', marginTop: 16, padding: '12px', background: 'var(--gold)', color: '#000', border: 'none', borderRadius: 8, fontWeight: 700 }}
+            style={{ width: '100%', marginTop: 8, padding: '16px', background: 'var(--gold)', color: '#000', border: 'none', borderRadius: 12, fontWeight: 800, fontSize: 14 }}
           >
             CARRINHO ({totalItems})
           </button>
