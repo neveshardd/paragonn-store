@@ -48,11 +48,11 @@ export default function ShopContent({
     };
 
     return (
-        <div>
-            <div className="shop-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 48, alignItems: 'flex-start' }}>
+        <div style={{ width: '100%', overflowX: 'hidden' }}>
+            <div className="shop-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 48, alignItems: 'flex-start', width: '100%' }}>
 
                 {/* Sidebar Navigation */}
-                <aside className="shop-sidebar" style={{ position: 'sticky', top: 100 }}>
+                <aside className="shop-sidebar" style={{ position: 'sticky', top: 100, minWidth: 0 }}>
                     {/* SERVIDORES */}
                     <div className="filter-section">
                         <h3 className="sidebar-label" style={{ fontSize: 11, fontWeight: 900, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: 16, paddingLeft: 12 }}>
@@ -161,7 +161,7 @@ export default function ShopContent({
                 </aside>
 
                 {/* Product Grid Area */}
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="grid-header" style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h2 style={{ fontSize: 24, fontWeight: 800, color: '#fff', fontFamily: 'var(--font-display)' }}>
                             {selectedCat ? categorias.find(c => c.id === selectedCat)?.nome : 'Destaques'}
@@ -263,13 +263,22 @@ export default function ShopContent({
             <style>{`
           @media (max-width: 1000px) {
               .shop-layout { grid-template-columns: 1fr !important; gap: 32px !important; }
-              aside.shop-sidebar { position: relative !important; top: 0 !important; width: 100% !important; }
-              .filter-list { flex-direction: row !important; overflow-x: auto !important; padding-bottom: 12px !important; scrollbar-width: none !important; }
+              aside.shop-sidebar { position: relative !important; top: 0 !important; width: 100% !important; margin-bottom: 24px; }
+              .filter-list { 
+                  flex-direction: row !important; 
+                  overflow-x: auto !important; 
+                  padding-bottom: 12px !important; 
+                  scrollbar-width: none !important;
+                  width: calc(100vw - 40px);
+                  margin-left: -20px;
+                  padding-left: 20px;
+                  padding-right: 20px;
+              }
               .filter-list::-webkit-scrollbar { display: none; }
-              .filter-list button { white-space: nowrap !important; padding: 10px 20px !important; }
+              .filter-list button { white-space: nowrap !important; padding: 10px 20px !important; flex-shrink: 0; }
               .sidebar-divider, .support-card { display: none !important; }
               .grid-header { margin-bottom: 24px !important; }
-              .product-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+              .product-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; gap: 16px !important; }
           }
           @media (max-width: 480px) {
               .product-grid { grid-template-columns: 1fr !important; }
