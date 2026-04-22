@@ -178,14 +178,15 @@ export default function ShopContent({
 
                     <div className="product-grid" style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                        gap: 24
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gap: 16
                     }}>
                         {filteredProdutos.map(prod => (
-                            <article key={prod.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 0, overflow: 'hidden' }}>
+                             <article key={prod.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 0, overflow: 'hidden' }}>
                                 <div style={{
                                     position: 'relative',
-                                    height: 180,
+                                    width: '100%',
+                                    aspectRatio: '1 / 1',
                                     background: 'linear-gradient(45deg, #15131f, #1a1726)',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -206,19 +207,19 @@ export default function ShopContent({
                                             referrerPolicy="no-referrer"
                                         />
                                     ) : (
-                                        <div style={{ fontSize: 72, filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.5))' }}>
+                                        <div style={{ fontSize: 48, filter: 'drop-shadow(0 10px 20px rgba(0,0,0,0.5))' }}>
                                             {prod.categoriaId === 1 ? '💎' : prod.categoriaId === 2 ? '⚔️' : '🎁'}
                                         </div>
                                     )}
                                     <div style={{
                                         position: 'absolute',
-                                        bottom: 16,
-                                        left: 16,
-                                        padding: '4px 12px',
+                                        bottom: 12,
+                                        left: 12,
+                                        padding: '4px 10px',
                                         background: 'var(--gold-linear)',
                                         color: '#000',
                                         borderRadius: 100,
-                                        fontSize: 10,
+                                        fontSize: 9,
                                         fontWeight: 900,
                                         textTransform: 'uppercase',
                                         pointerEvents: 'none'
@@ -227,31 +228,31 @@ export default function ShopContent({
                                     </div>
                                 </div>
 
-                                <div style={{ padding: '28px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                    <div style={{ marginBottom: 16 }}>
-                                        <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                                <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                    <div style={{ marginBottom: 12 }}>
+                                        <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
                                             {categorias.find(c => c.id === prod.categoriaId)?.nome}
                                         </div>
-                                        <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>{prod.nome}</h3>
+                                        <h3 style={{ fontSize: 17, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>{prod.nome}</h3>
                                     </div>
 
-                                    <p style={{ fontSize: 14, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 32, flex: 1 }}>
+                                    <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.5, marginBottom: 20, flex: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                         {prod.descricao}
                                     </p>
 
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto', paddingTop: 20, borderTop: '1px solid var(--border)' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 2 }}>Investimento</span>
-                                            <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-display)' }}>
+                                    <div style={{ marginTop: 'auto', paddingTop: 16, borderTop: '1px solid var(--border)' }}>
+                                        <div style={{ marginBottom: 16 }}>
+                                            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 2 }}>Investimento</div>
+                                            <div style={{ fontSize: 28, fontWeight: 900, color: '#fff', fontFamily: 'var(--font-display)' }}>
                                                 R$ {prod.preco.toFixed(2)}
                                             </div>
                                         </div>
                                         
-                                        <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
+                                        <div style={{ display: 'flex', gap: 10 }}>
                                             <button 
                                                 className="btn-primary" 
                                                 onClick={() => handleAdd(prod)} 
-                                                style={{ padding: '0 24px', borderRadius: 12, fontSize: 12, height: 48, display: 'flex', alignItems: 'center' }}
+                                                style={{ flex: 1, borderRadius: 10, fontSize: 12, height: 46, fontWeight: 800 }}
                                             >
                                                 ADQUIRIR
                                             </button>
@@ -259,11 +260,11 @@ export default function ShopContent({
                                                 className="btn-quick-add"
                                                 onClick={() => handleQuickAdd(prod)}
                                                 style={{ 
-                                                    width: 48, 
-                                                    height: 48, 
+                                                    width: 46, 
+                                                    height: 46, 
                                                     background: 'rgba(255,255,255,0.05)', 
                                                     border: 'none', 
-                                                    borderRadius: 12, 
+                                                    borderRadius: 10, 
                                                     color: '#fff', 
                                                     fontSize: 22, 
                                                     fontWeight: 600, 
@@ -298,12 +299,15 @@ export default function ShopContent({
             <style>{`
           .btn-quick-add:hover {
               transform: translateY(-2px);
-              box-shadow: 0 6px 0px #13111a !important;
+              box-shadow: 0 5px 0px #13111a !important;
               background: rgba(255,255,255,0.08) !important;
           }
           .btn-quick-add:active {
               transform: translateY(2px);
-              box-shadow: 0 2px 0px #13111a !important;
+              box-shadow: 0 1px 0px #13111a !important;
+          }
+          @media (max-width: 1200px) {
+              .product-grid { grid-template-columns: repeat(2, 1fr) !important; }
           }
           @media (max-width: 1000px) {
               .shop-layout { grid-template-columns: 1fr !important; gap: 32px !important; }
@@ -317,6 +321,7 @@ export default function ShopContent({
                   margin-left: -20px;
                   padding-left: 20px;
                   padding-right: 20px;
+                  padding-top: 4px;
               }
               .filter-list::-webkit-scrollbar { display: none; }
               .filter-list button { white-space: nowrap !important; padding: 10px 20px !important; flex-shrink: 0; }

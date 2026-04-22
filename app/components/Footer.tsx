@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 /* eslint-disable @next/next/no-img-element */
 export default function Footer() {
@@ -45,9 +46,9 @@ export default function Footer() {
               Institucional
             </h4>
             <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {["Termos de Uso", "Privacidade", "Reembolso"].map((t) => (
-                <a key={t} href="#" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>{t}</a>
-              ))}
+              <Link href="/termos" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Termos de Uso</Link>
+              <Link href="/privacidade" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Privacidade</Link>
+              <Link href="/reembolso" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Reembolso</Link>
               <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Discord</a>
               <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Suporte</a>
             </nav>
