@@ -75,20 +75,27 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 11px 26px;
+  padding: 14px 32px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
   background: var(--glass);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 12px;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0px #13111a;
+  position: relative;
 }
 .btn-outline:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: var(--muted);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0px #13111a;
+}
+.btn-outline:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px #13111a;
 }
 
 .section-label {

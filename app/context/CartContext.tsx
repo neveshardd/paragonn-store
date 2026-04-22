@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
 type Produto = {
   id: number;
@@ -11,12 +11,21 @@ type Produto = {
 
 type CartItem = Produto & { quantity: number };
 
+type Coupon = {
+  codigo: string;
+  desconto: number;
+};
+
 type CartContextType = {
   cart: CartItem[];
-  addToCart: (product: Produto) => void;
+  addToCart: (product: Produto, openCart?: boolean) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
   total: number;
+  subtotal: number;
+  discount: number;
+  coupon: Coupon | null;
+  applyCoupon: (coupon: Coupon | null) => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
 };
@@ -25,30 +34,58 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const isInitializing = useRef(true);
 
-  // Carrega o carrinho inicial
+  // 1. Carregar do localStorage (Apenas no mount)
   useEffect(() => {
-    const savedCart = localStorage.getItem("paragonn_cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error("Erro ao carregar carrinho", e);
+    const loadData = () => {
+      const savedCart = localStorage.getItem("paragonn_cart");
+      const savedCoupon = localStorage.getItem("paragonn_coupon");
+      
+      if (savedCart) {
+        try {
+          const parsed = JSON.parse(savedCart);
+          if (Array.isArray(parsed)) setCart(parsed);
+        } catch (e) {
+          console.error("Erro ao carregar carrinho", e);
+        }
       }
-    }
-    setIsLoaded(true);
+      
+      if (savedCoupon) {
+        try {
+          const parsed = JSON.parse(savedCoupon);
+          if (parsed && parsed.codigo) setCoupon(parsed);
+        } catch (e) {
+          console.error("Erro ao carregar cupom", e);
+        }
+      }
+      
+      // Pequeno delay para garantir que o React processe os sets acima antes de liberar o salvamento
+      setTimeout(() => {
+        isInitializing.current = false;
+        setIsLoaded(true);
+      }, 0);
+    };
+
+    loadData();
   }, []);
 
-  // Salva sempre que o carrinho mudar
+  // 2. Salvar no localStorage (Sempre que mudar, exceto durante a inicialização)
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("paragonn_cart", JSON.stringify(cart));
+    if (isInitializing.current || !isLoaded) return;
+    
+    localStorage.setItem("paragonn_cart", JSON.stringify(cart));
+    if (coupon) {
+      localStorage.setItem("paragonn_coupon", JSON.stringify(coupon));
+    } else {
+      localStorage.removeItem("paragonn_coupon");
     }
-  }, [cart, isLoaded]);
+  }, [cart, coupon, isLoaded]);
 
-  const addToCart = (product: Produto) => {
+  const addToCart = (product: Produto, openCart = true) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
@@ -58,7 +95,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
-    setIsCartOpen(true);
+    if (openCart) {
+      setIsCartOpen(true);
+    }
   };
 
   const removeFromCart = (productId: number) => {
@@ -67,13 +106,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem("paragonn_cart");
+    setCoupon(null);
   };
 
-  const total = cart.reduce((acc, item) => acc + item.preco * item.quantity, 0);
+  const applyCoupon = (cp: Coupon | null) => {
+    setCoupon(cp);
+  };
+
+  const subtotal = cart.reduce((acc, item) => acc + item.preco * item.quantity, 0);
+  const discount = coupon ? (subtotal * coupon.desconto) / 100 : 0;
+  const total = subtotal - discount;
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, total, isCartOpen, setIsCartOpen }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      clearCart, 
+      total, 
+      subtotal,
+      discount,
+      coupon,
+      applyCoupon,
+      isCartOpen, 
+      setIsCartOpen 
+    }}>
       {children}
     </CartContext.Provider>
   );

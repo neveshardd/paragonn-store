@@ -48,12 +48,24 @@ async function getGoal() {
   }
 }
 
+async function getDiscordLink() {
+  try {
+    const res = await fetch(`${WEBPANEL}/api/configuracoes`, { cache: 'no-store' });
+    if (!res.ok) return 'https://discord.gg/paragonn';
+    const configs = await res.json();
+    return configs.discord_link || 'https://discord.gg/paragonn';
+  } catch (err) {
+    return 'https://discord.gg/paragonn';
+  }
+}
+
 export default async function Home() {
-  const [produtos, categorias, servidores, goal] = await Promise.all([
+  const [produtos, categorias, servidores, goal, discordLink] = await Promise.all([
     getProdutos(),
     getCategorias(),
     getServidores(),
-    getGoal()
+    getGoal(),
+    getDiscordLink()
   ]);
 
   return (
@@ -69,9 +81,9 @@ export default async function Home() {
               Explore nossa coleção de itens, vantagens e pacotes exclusivos.
               Todo o lucro é reinvestido na melhoria contínua dos nossos servidores.
             </p>
-            <div className="hero-buttons" style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-              <a href="#produtos" className="btn-primary">VER PRODUTOS</a>
-              <a href="https://discord.gg/paragonn" target="_blank" className="btn-outline">NOSSO DISCORD</a>
+            <div className="hero-buttons" style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'stretch' }}>
+              <a href="#produtos" className="btn-primary" style={{ height: 54, display: 'flex', alignItems: 'center' }}>VER PRODUTOS</a>
+              <a href={discordLink} target="_blank" className="btn-outline" style={{ height: 54, display: 'flex', alignItems: 'center' }}>NOSSO DISCORD</a>
             </div>
           </div>
         </section>
@@ -80,7 +92,7 @@ export default async function Home() {
         <div className="section-divider" style={{ height: 1, background: 'linear-gradient(to right, transparent, var(--border), transparent)', marginBottom: 80 }}></div>
 
         <section id="produtos" style={{ marginBottom: 80 }}>
-          <ShopContent produtos={produtos} categorias={categorias} servidores={servidores} />
+          <ShopContent produtos={produtos} categorias={categorias} servidores={servidores} discordLink={discordLink} />
         </section>
 
         {/* Divisor */}
@@ -98,7 +110,8 @@ export default async function Home() {
               .main-content { padding-top: 120px; }
               .hero-section { margin-bottom: 60px !important; }
               .hero-description { font-size: 15px !important; margin-bottom: 24px !important; }
-              .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; }
+              .hero-buttons { flex-direction: column; width: 100%; max-width: 300px; margin: 0 auto; gap: 20px !important; }
+              .hero-buttons a { width: 100%; justify-content: center; }
               .section-divider { margin-bottom: 40px !important; margin-top: 40px !important; }
           }
       `}</style>

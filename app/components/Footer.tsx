@@ -1,5 +1,20 @@
+"use client";
+import { useState, useEffect } from "react";
+
 /* eslint-disable @next/next/no-img-element */
 export default function Footer() {
+  const [discordLink, setDiscordLink] = useState('https://discord.gg/paragonn');
+
+  useEffect(() => {
+    const WEBPANEL = process.env.NEXT_PUBLIC_DASH_URL || "http://localhost:5173";
+    fetch(`${WEBPANEL}/api/configuracoes`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.discord_link) setDiscordLink(data.discord_link);
+      })
+      .catch(err => console.error("Erro ao buscar link do Discord:", err));
+  }, []);
+
   const currentYear = new Date().getFullYear();
 
   return (
@@ -30,9 +45,11 @@ export default function Footer() {
               Institucional
             </h4>
             <nav style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {["Termos de Uso", "Privacidade", "Reembolso", "Suporte"].map((t) => (
+              {["Termos de Uso", "Privacidade", "Reembolso"].map((t) => (
                 <a key={t} href="#" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>{t}</a>
               ))}
+              <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Discord</a>
+              <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Suporte</a>
             </nav>
           </div>
 

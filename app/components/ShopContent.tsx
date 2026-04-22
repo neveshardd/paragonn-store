@@ -26,15 +26,17 @@ type Servidor = {
 export default function ShopContent({
     produtos,
     categorias,
-    servidores
+    servidores,
+    discordLink = 'https://discord.gg/paragonn'
 }: {
     produtos: Produto[],
     categorias: Categoria[],
-    servidores: Servidor[]
+    servidores: Servidor[],
+    discordLink?: string
 }) {
     const [selectedCat, setSelectedCat] = useState<number | null>(null);
     const [selectedServ, setSelectedServ] = useState<number | null>(null);
-    const { addToCart, setIsCartOpen } = useCart();
+    const { addToCart } = useCart();
 
     const filteredProdutos = produtos.filter(p => {
         const matchesServ = selectedServ !== null ? p.servidorId === selectedServ : true;
@@ -43,8 +45,11 @@ export default function ShopContent({
     });
 
     const handleAdd = (prod: Produto) => {
-        addToCart(prod);
-        setIsCartOpen(true);
+        addToCart(prod, true);
+    };
+
+    const handleQuickAdd = (prod: Produto) => {
+        addToCart(prod, false);
     };
 
     return (
@@ -156,7 +161,7 @@ export default function ShopContent({
                         <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6, marginBottom: 20 }}>
                             Abra um ticket em nosso Discord ou Instagram.
                         </p>
-                        <a href="#" className="btn-outline" style={{ display: 'flex', width: '100%', fontSize: 12 }}>SUPORTE</a>
+                        <a href={discordLink} target="_blank" className="btn-outline" style={{ display: 'flex', width: '100%', fontSize: 12 }}>SUPORTE</a>
                     </div>
                 </aside>
 
@@ -241,9 +246,39 @@ export default function ShopContent({
                                                 R$ {prod.preco.toFixed(2)}
                                             </div>
                                         </div>
-                                        <button className="btn-primary" onClick={() => handleAdd(prod)} style={{ padding: '12px 20px', borderRadius: 12 }}>
-                                            ADQUIRIR
-                                        </button>
+                                        
+                                        <div style={{ display: 'flex', gap: 12, alignItems: 'stretch' }}>
+                                            <button 
+                                                className="btn-primary" 
+                                                onClick={() => handleAdd(prod)} 
+                                                style={{ padding: '0 24px', borderRadius: 12, fontSize: 12, height: 48, display: 'flex', alignItems: 'center' }}
+                                            >
+                                                ADQUIRIR
+                                            </button>
+                                            <button 
+                                                className="btn-quick-add"
+                                                onClick={() => handleQuickAdd(prod)}
+                                                style={{ 
+                                                    width: 48, 
+                                                    height: 48, 
+                                                    background: 'rgba(255,255,255,0.05)', 
+                                                    border: 'none', 
+                                                    borderRadius: 12, 
+                                                    color: '#fff', 
+                                                    fontSize: 22, 
+                                                    fontWeight: 600, 
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    transition: 'all 0.2s ease',
+                                                    boxShadow: '0 4px 0px #13111a',
+                                                    position: 'relative'
+                                                }}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </article>
@@ -261,6 +296,15 @@ export default function ShopContent({
             </div>
 
             <style>{`
+          .btn-quick-add:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 0px #13111a !important;
+              background: rgba(255,255,255,0.08) !important;
+          }
+          .btn-quick-add:active {
+              transform: translateY(2px);
+              box-shadow: 0 2px 0px #13111a !important;
+          }
           @media (max-width: 1000px) {
               .shop-layout { grid-template-columns: 1fr !important; gap: 32px !important; }
               aside.shop-sidebar { position: relative !important; top: 0 !important; width: 100% !important; margin-bottom: 24px; }

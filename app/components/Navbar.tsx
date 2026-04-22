@@ -7,13 +7,18 @@ import { useCart } from "../context/CartContext";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const { setIsCartOpen, cart } = useCart();
 
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    // Check initial scroll position
+    handleScroll();
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -53,47 +58,64 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Links */}
-        <nav className="nav-desktop" style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          <a href={webUrl} style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Voltar ao Site</a>
+        {/* Desktop & Mobile Links */}
+        <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <a href={webUrl} className="nav-link-site" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Voltar ao Site</a>
           
-          <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
+          <div className="nav-divider" style={{ width: 1, height: 16, background: 'var(--border)' }} />
 
+          {/* Cart Icon with Badge */}
           <button
             onClick={() => setIsCartOpen(true)}
-            className="btn-outline"
-            style={{ padding: '10px 20px', fontSize: 13, borderRadius: 100, position: 'relative' }}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              padding: 0,
+              cursor: 'pointer', 
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              transition: 'transform 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
-            🛒 Carrinho ({totalItems})
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            
+            {totalItems > 0 && (
+              <span style={{ 
+                position: 'absolute', 
+                top: -8, 
+                right: -10, 
+                background: 'var(--gold)', 
+                color: '#000', 
+                fontSize: 10, 
+                fontWeight: 900, 
+                minWidth: 18, 
+                height: 18, 
+                borderRadius: 10, 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                padding: '0 4px',
+                boxShadow: '0 0 15px rgba(245, 166, 35, 0.4)'
+              }}>
+                {totalItems}
+              </span>
+            )}
           </button>
         </nav>
-
-        {/* Mobile Toggle */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="nav-mobile-btn"
-          style={{ display: 'none', background: 'none', border: 'none', color: '#fff', fontSize: 11, fontWeight: 700, letterSpacing: '0.1em' }}
-        >
-          {menuOpen ? 'FECHAR' : 'MENU'}
-        </button>
       </div>
-
-      {menuOpen && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(12, 11, 15, 0.98)', backdropFilter: 'blur(16px)', padding: 24, borderBottom: '1px solid var(--border)', zIndex: 100 }}>
-          <a href={webUrl} style={{ display: 'block', textAlign: 'center', color: '#fff', padding: '16px 0', textDecoration: 'none', fontWeight: 600 }}>Voltar ao Site</a>
-          <button
-            onClick={() => { setIsCartOpen(true); setMenuOpen(false); }}
-            style={{ width: '100%', marginTop: 8, padding: '16px', background: 'var(--gold)', color: '#000', border: 'none', borderRadius: 12, fontWeight: 800, fontSize: 14 }}
-          >
-            CARRINHO ({totalItems})
-          </button>
-        </div>
-      )}
 
       <style>{`
         @media (max-width: 768px) {
-            .nav-desktop { display: none !important; }
-            .nav-mobile-btn { display: block !important; }
+            .nav-link-site, .nav-divider { display: none !important; }
         }
       `}</style>
     </header>
