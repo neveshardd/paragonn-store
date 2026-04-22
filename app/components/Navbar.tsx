@@ -60,18 +60,18 @@ export default function Navbar() {
 
         {/* Desktop & Mobile Links */}
         <nav style={{ display: "flex", alignItems: "center", gap: 32 }}>
-          <a href={webUrl} className="nav-link-site" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Voltar ao Site</a>
-          
+          <a href={webUrl} className="nav-link-site" style={{ fontSize: 13, fontWeight: 600, color: "var(--muted)", textDecoration: "none", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ir para o Site</a>
+
           <div className="nav-divider" style={{ width: 1, height: 16, background: 'var(--border)' }} />
 
           {/* Cart Icon with Badge */}
           <button
             onClick={() => setIsCartOpen(true)}
-            style={{ 
-              background: 'none', 
-              border: 'none', 
+            style={{
+              background: 'none',
+              border: 'none',
               padding: 0,
-              cursor: 'pointer', 
+              cursor: 'pointer',
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
@@ -87,21 +87,21 @@ export default function Navbar() {
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            
+
             {totalItems > 0 && (
-              <span style={{ 
-                position: 'absolute', 
-                top: -8, 
-                right: -10, 
-                background: 'var(--gold)', 
-                color: '#000', 
-                fontSize: 10, 
-                fontWeight: 900, 
-                minWidth: 18, 
-                height: 18, 
-                borderRadius: 10, 
-                display: 'flex', 
-                alignItems: 'center', 
+              <span style={{
+                position: 'absolute',
+                top: -8,
+                right: -10,
+                background: 'var(--gold)',
+                color: '#000',
+                fontSize: 10,
+                fontWeight: 900,
+                minWidth: 18,
+                height: 18,
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: 'center',
                 padding: '0 4px',
                 boxShadow: '0 0 15px rgba(245, 166, 35, 0.4)'
