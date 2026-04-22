@@ -48,25 +48,31 @@ async function getGoal() {
   }
 }
 
-async function getDiscordLink() {
+async function getConfigs() {
   try {
     const res = await fetch(`${WEBPANEL}/api/configuracoes`, { cache: 'no-store' });
-    if (!res.ok) return 'https://discord.gg/paragonn';
+    if (!res.ok) return { discord_link: 'https://discord.gg/paragonn', server_ip: 'play.paragonn.com.br' };
     const configs = await res.json();
-    return configs.discord_link || 'https://discord.gg/paragonn';
+    return {
+      discord_link: configs.discord_link || 'https://discord.gg/paragonn',
+      server_ip: configs.server_ip || 'play.paragonn.com.br'
+    };
   } catch (err) {
-    return 'https://discord.gg/paragonn';
+    console.error('Erro ao buscar configurações do Painel:', err);
+    return { discord_link: 'https://discord.gg/paragonn', server_ip: 'play.paragonn.com.br' };
   }
 }
 
 export default async function Home() {
-  const [produtos, categorias, servidores, goal, discordLink] = await Promise.all([
+  const [produtos, categorias, servidores, goal, configs] = await Promise.all([
     getProdutos(),
     getCategorias(),
     getServidores(),
     getGoal(),
-    getDiscordLink()
+    getConfigs()
   ]);
+
+  const { discord_link: discordLink, server_ip: serverIP } = configs;
 
   return (
     <main className="main-content" style={{ minHeight: '100vh', paddingBottom: 100, background: 'var(--bg)' }}>
@@ -81,7 +87,7 @@ export default async function Home() {
               Explore nossa coleção de itens, vantagens e pacotes exclusivos.
               Todo o lucro é reinvestido na melhoria contínua dos nossos servidores.
             </p>
-            <div className="hero-buttons" style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'stretch' }}>
+            <div className="hero-buttons" style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
               <a href="#produtos" className="btn-primary" style={{ height: 54, display: 'flex', alignItems: 'center' }}>VER PRODUTOS</a>
               <a href={discordLink} target="_blank" className="btn-outline" style={{ height: 54, display: 'flex', alignItems: 'center' }}>NOSSO DISCORD</a>
             </div>

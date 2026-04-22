@@ -5,6 +5,7 @@ import Link from "next/link";
 /* eslint-disable @next/next/no-img-element */
 export default function Footer() {
   const [discordLink, setDiscordLink] = useState('https://discord.gg/paragonn');
+  const [serverIP, setServerIP] = useState('play.paragonn.com.br');
 
   useEffect(() => {
     const WEBPANEL = process.env.NEXT_PUBLIC_DASH_URL || "http://localhost:5173";
@@ -12,6 +13,7 @@ export default function Footer() {
       .then(res => res.json())
       .then(data => {
         if (data.discord_link) setDiscordLink(data.discord_link);
+        if (data.server_ip) setServerIP(data.server_ip);
       })
       .catch(err => console.error("Erro ao buscar link do Discord:", err));
   }, []);
@@ -38,6 +40,44 @@ export default function Footer() {
             <p style={{ color: "#7a7590", fontSize: 13, marginBottom: 20, lineHeight: 1.6 }}>
               A loja oficial do servidor Paragonn. Qualidade, segurança e os melhores benefícios exclusivos para sua aventura com a gente.
             </p>
+            <div style={{ 
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 16px',
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid #2a2540',
+                borderRadius: 10,
+                marginTop: 8
+            }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span style={{ fontSize: 9, fontWeight: 700, color: '#7a7590', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Conectar</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--gold)', fontFamily: 'ui-monospace, monospace' }}>{serverIP}</span>
+                </div>
+                <button 
+                    onClick={() => {
+                        navigator.clipboard.writeText(serverIP);
+                    }}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: '#7a7590',
+                        padding: 4,
+                        display: 'flex',
+                        alignItems: 'center',
+                        transition: 'color 0.2s'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+                    onMouseLeave={e => e.currentTarget.style.color = '#7a7590'}
+                    title="Copiar IP"
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                </button>
+            </div>
           </div>
 
           {/* Links */}
