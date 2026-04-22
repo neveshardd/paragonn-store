@@ -49,7 +49,6 @@ export default function Footer() {
               <Link href="/termos" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Termos de Uso</Link>
               <Link href="/privacidade" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Privacidade</Link>
               <Link href="/reembolso" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Reembolso</Link>
-              <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Discord</a>
               <a href={discordLink} target="_blank" style={{ color: "#7a7590", fontSize: 14, textDecoration: "none", transition: 'color 0.2s' }}>Suporte</a>
             </nav>
           </div>
