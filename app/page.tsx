@@ -1,7 +1,7 @@
 import ShopContent from "./components/ShopContent";
 import GoalProgress from "./components/GoalProgress";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 const WEBPANEL = process.env.NEXT_PUBLIC_DASH_URL ?? "http://localhost:5173";
 
