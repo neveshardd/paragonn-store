@@ -7,7 +7,7 @@ const WEBPANEL = process.env.NEXT_PUBLIC_DASH_URL ?? "http://localhost:5173";
 
 async function getProdutos() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/produtos`, { cache: 'no-store' });
+    const res = await fetch(`${WEBPANEL}/api/produtos`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     return res.json();
   } catch (err) {
@@ -18,7 +18,7 @@ async function getProdutos() {
 
 async function getCategorias() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/categorias`, { cache: 'no-store' });
+    const res = await fetch(`${WEBPANEL}/api/categorias`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     return res.json();
   } catch (err) {
@@ -29,7 +29,7 @@ async function getCategorias() {
 
 async function getServidores() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/servidores`, { cache: 'no-store' });
+    const res = await fetch(`${WEBPANEL}/api/servidores`, { next: { revalidate: 60 } });
     if (!res.ok) return [];
     return res.json();
   } catch (err) {
@@ -39,7 +39,7 @@ async function getServidores() {
 }
 async function getGoal() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/goal`, { cache: 'no-store' });
+    const res = await fetch(`${WEBPANEL}/api/goal`, { next: { revalidate: 60 } });
     if (!res.ok) return null;
     return res.json();
   } catch (err) {
@@ -50,7 +50,7 @@ async function getGoal() {
 
 async function getConfigs() {
   try {
-    const res = await fetch(`${WEBPANEL}/api/configuracoes`, { cache: 'no-store' });
+    const res = await fetch(`${WEBPANEL}/api/configuracoes`, { next: { revalidate: 60 } });
     if (!res.ok) return { discord_link: 'https://discord.gg/paragonn', server_ip: 'play.paragonn.com.br' };
     const configs = await res.json();
     return {
